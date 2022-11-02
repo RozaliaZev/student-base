@@ -27,15 +27,15 @@ func main() {
 			break
 		}
 
-    var inputMasInf []string = strings.Fields(inputInf)
-    if len(inputMasInf) != 3 {
-      fmt.Println("Введите имя, возраст и курс студента.")
-    } else {
-      studentName, studentInf := stringToStruct(inputInf)
+    	var inputMasInf []string = strings.Fields(inputInf)
 
-		  studentMap[studentName] = studentInf
-		  i++
-    }
+    	if len(inputMasInf) != 3 {
+      		fmt.Println("Введите имя, возраст и курс студента.")
+    	} else {
+      		studentName, studentInf := stringToStruct(inputInf)
+			studentMap[studentName] = studentInf
+			i++
+    	}
 	}
 	
 	
@@ -47,17 +47,19 @@ func main() {
 		fmt.Println("--------------------")
 		fmt.Println("Если хотите изменить данные, напишите имя студента")
 		var studentName string
-		fmt.Scan(&studentName)
+		input.Scan()
+    	studentName = input.Text()
 		if studentName != "нет" {
 			fmt.Println("Существующие данные о студенте", studentName)
 
-      		if studentMap[studentName].getInf(studentMap, studentName) == nil {
+      		if studentMap[studentName].getInf(studentMap, studentName) != nil {
         		fmt.Println("--------------------")
 				fmt.Println("Введите новые данные о возрасте и курсе студента")
 				input.Scan()
     			inputInfNewAgeGrade := input.Text()
 			
 				newInf := studentName + " " + inputInfNewAgeGrade
+				fmt.Println("проверка", newInf)
 				fmt.Println(newInf)
 				_, studentInfNew := stringToStruct(newInf)
 				studentMap[studentName].putInf(studentInfNew.age, studentInfNew.grade)
@@ -76,6 +78,10 @@ func main() {
 func stringToStruct(inputInf string) (studentName string, student *Student)  {
 	var inputMasInf []string = strings.Fields(inputInf)
 
+	studentName = inputMasInf[0]
+
+	fmt.Println(strconv.Atoi(inputMasInf[1]))
+
 	studentAge, err := strconv.Atoi(inputMasInf[1])
 	
 	if err != nil {
@@ -91,7 +97,6 @@ func stringToStruct(inputInf string) (studentName string, student *Student)  {
 		return
 	}
 	
-	studentName = inputMasInf[0]
 	student = &Student{inputMasInf[0], studentAge, studentGrade}
 	return 
 }
@@ -102,8 +107,8 @@ func (s *Student) putInf (studentAge, studentGrade int) {
 	return
 }
 
-func (s *Student) getInf (studentMap map[string]*Student, studentName string) (err error){
-	err = nil
+func (s *Student) getInf (studentMap map[string]*Student, studentName string) (err error) {
+	err = fmt.Errorf("пук пук %v нет в базе \n", studentName) //nil
 	for _, value := range studentMap {
 			if value.name == studentName {
 			fmt.Println(s.age, s.grade)
