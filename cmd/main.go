@@ -3,16 +3,17 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"log"
 	"os"
 	"strconv"
 	"strings"
-	"log"
+	"test/pkg/storage"
 	"test/pkg/student"
 )
 
 
 func main() {
-	studentMap := make(map[string]*student.Student)
+	studentMap := storage.NewStudentStorage()
 	var input = bufio.NewScanner(os.Stdin)
 	i := 0
 	for  {
@@ -36,9 +37,7 @@ func main() {
 	
 	
 	for {
-		for _,value := range studentMap {
-		fmt.Println(value.Name, value.Age, value.Grade)
-		}
+		storage.PrintStudentStorage(studentMap)
 
 		fmt.Println("--------------------")
 		fmt.Println("Если хотите изменить данные, напишите имя студента")
@@ -61,7 +60,7 @@ func main() {
 				fmt.Println("--------------------")
 				fmt.Println("Обновленный список студентов:")
             } else {
-        		return
+        		continue
       		}	
 		} else {
 			return
