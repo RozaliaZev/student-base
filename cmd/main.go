@@ -2,8 +2,8 @@ package main
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
-	"log"
 	"os"
 	"strconv"
 	"strings"
@@ -13,6 +13,8 @@ import (
 
 
 func main() {
+	fmt.Println("Создание базы студентов")
+	fmt.Println("Введите данные о студенте, его имя, возраст и курс обучения.")
 	studentMap := storage.NewStudentStorage()
 	var input = bufio.NewScanner(os.Stdin)
 	i := 0
@@ -24,12 +26,12 @@ func main() {
 			break
 		}
 
-    	var inputMasInf []string = strings.Fields(inputInf)
-
-    	if len(inputMasInf) != 3 {
-      		fmt.Println("Введите имя, возраст и курс студента.")
+		studentName, studentInf, inputErr := stringToStruct(inputInf)
+    	
+		if inputErr != nil {
+      		fmt.Println(inputErr)
     	} else {
-      		studentName, studentInf := stringToStruct(inputInf)
+      		//studentName, studentInf, _ := stringToStruct(inputInf)
 			studentMap[studentName] = studentInf
 			i++
     	}
@@ -54,11 +56,15 @@ func main() {
     			inputInfNewAgeGrade := input.Text()
 			
 				newInf := studentName + " " + inputInfNewAgeGrade
-				_, studentInfNew := stringToStruct(newInf)
-				studentMap[studentName].PutInf(studentInfNew.Age, studentInfNew.Grade)
+				_, studentInfNew, inputErr := stringToStruct(newInf)
 
-				fmt.Println("--------------------")
-				fmt.Println("Обновленный список студентов:")
+				if inputErr != nil {
+					fmt.Println(inputErr)
+				} else {
+					studentMap[studentName].PutInf(studentInfNew.Age, studentInfNew.Grade)
+					fmt.Println("--------------------")
+					fmt.Println("Обновленный список студентов:")
+				}	
             } else {
         		continue
       		}	
@@ -68,27 +74,32 @@ func main() {
 	}
 }
 
-func stringToStruct(inputInf string) (studentName string, newStudent *student.Student)  {
+func stringToStruct(inputInf string) (studentName string, newStudent *student.Student, err error)  {
 	var inputMasInf []string = strings.Fields(inputInf)
+
+	if len(inputMasInf) != 3 {
+		err = errors.New("Введено неверное колическо параметров. Введите имя, возраст и курс студента.")
+		return
+	} 
 
 	studentName = inputMasInf[0]
 
 	studentAge, err := strconv.Atoi(inputMasInf[1])
 	
-	if err != nil {
-		log.Fatal("ошибка ввода возраста студента: ", inputMasInf[0])
-		
+	if err != nil || studentAge <= 0 {
+		err = errors.New("ошибка ввода возраста студента " +inputMasInf[0])
 		return
 	}
 
 	studentGrade, err := strconv.Atoi(inputMasInf[2])
 
-	if err != nil {
-		log.Fatal("ошибка ввода курса студента", inputMasInf[0])
-		return
+	if err != nil || studentGrade <= 0 {
+		err = errors.New("ошибка ввода курса студента " + inputMasInf[0])
 	}
-	
-	newStudent = &student.Student{Name: inputMasInf[0], Age: studentAge, Grade: studentGrade}
+
+	if err == nil {
+		newStudent = &student.Student{Name: inputMasInf[0], Age: studentAge, Grade: studentGrade}
+	}
 	return 
 }
 
